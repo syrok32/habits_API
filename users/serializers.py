@@ -17,6 +17,16 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = "__all__"
+        # Явно перечисляем используемые поля, не включая password в ответе
+        fields = (
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password",  # write_only, появится только в POST/PUT запросах
+        )

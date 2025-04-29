@@ -1,7 +1,7 @@
 # Create your views here.
 from django.db.models import Q
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from habits.models import Habits
 from habits.pagination import MyPagination
@@ -35,3 +35,21 @@ class HabitViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return []
         return super().get_permissions()
+
+
+class PublicHabitsListView(generics.ListAPIView):
+    serializer_class = HabitSerializer
+    pagination_class = MyPagination
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Habits.objects.filter(is_public=True)
+
+
+class UserHabitsListView(generics.ListAPIView):
+    serializer_class = HabitSerializer
+    pagination_class = MyPagination
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Habits.objects.filter(owner=self.request.user)
